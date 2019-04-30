@@ -22,7 +22,11 @@
 
 
 chrome.runtime.onInstalled.addListener(function (details) {
-  if (details.reason == "install")
+  if (details.reason == "install") {
+    chrome.storage.local.set({
+        nativeEnabled: false,
+        emacsclientLocation: 'emacsclient',
+    })
     chrome.storage.sync.set(
       {
         selectedTemplate: 'p',
@@ -31,7 +35,11 @@ chrome.runtime.onInstalled.addListener(function (details) {
         debug: false,
         overlay: true
       });
-  else if ((details.reason == "update" && details.previousVersion.startsWith("0.1")))
+  } else if ((details.reason == "update" && details.previousVersion.startsWith("0.1"))) {
+    chrome.storage.local.set({
+        nativeEnabled: false,
+        emacsclientLocation: 'emacsclient',
+    })
     chrome.storage.sync.set(
       {
         selectedTemplate: 'p',
@@ -40,7 +48,27 @@ chrome.runtime.onInstalled.addListener(function (details) {
         debug: false,
         overlay: true
       });
+  }
 });
+
+chrome.runtime.onMessage.addListener(function(message, _, _respond) {
+  if (message.command === 'captureWithNativeHost') {
+    console.log("Calling native messaging host");
+    chrome.runtime.sendNativeMessage(
+      "io.github.sprig.org_capture_extension",
+      {"uri": message.uri, "emacsclientLocation": message.emacsclientLocation},
+    function (response) {
+      if (response === null || response === undefined) {
+        if (chrome.runtime.lastError) {
+          console.log("Native messaging host error: " + chrome.runtime.lastError.message);
+          return;
+        }
+      }
+    })
+  } else {
+    console.log(`Invalid command ${message.command}`);
+  }
+})
 
 chrome.browserAction.onClicked.addListener(function (tab) {
   chrome.tabs.executeScript({file: "capture.js"});

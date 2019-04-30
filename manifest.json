@@ -10,7 +10,7 @@
     "scripts": ["background.js"]
   },
 
-  "permissions": ["activeTab", "storage"],
+  "permissions": ["activeTab", "nativeMessaging", "storage"],
 
   "options_ui": {
     "page": "options.html"

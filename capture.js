@@ -53,11 +53,24 @@
         logURI(uri);
       }
 
-      location.href = uri;
+      window.console.log(`nativeEnabled = ${this.nativeEnabled}`);
+      if (this.nativeEnabled) {
+        this.captureWithNativeHost(uri);
+      } else {
+        location.href = uri;
+      }
 
       if (this.overlay) {
         toggleOverlay();
       }
+    }
+
+    captureWithNativeHost(uri) {
+      chrome.runtime.sendMessage({
+        command: "captureWithNativeHost",
+        uri: uri,
+        emacsclientLocation: this.emacsclientLocation,
+      })
     }
 
     captureIt(options) {
@@ -153,6 +166,13 @@
 
 
   var capture = new Capture();
-  var f = function (options) {capture.captureIt(options)};
-  chrome.storage.sync.get(null, f);
+  var g = function(localOptions) {
+    return function(syncOptions) {
+      capture.captureIt({...localOptions, ...syncOptions});
+    }
+  }
+  var f = function (localOptions) {
+    chrome.storage.sync.get(null, g(localOptions));
+  };
+  chrome.storage.local.get(null, f);
 })();

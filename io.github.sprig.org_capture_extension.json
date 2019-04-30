@@ -1,0 +1,9 @@
+{
+  "name": "io.github.sprig.org_capture_extension",
+  "description": "Org Capture Extension",
+  "path": "",
+  "type": "stdio",
+  "allowed_origins": [
+    "chrome-extension://nhhnahlcbpbgajpbhchipaplnddpajdh/"
+  ]
+}

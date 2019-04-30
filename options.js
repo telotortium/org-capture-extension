@@ -29,6 +29,15 @@ function save_options() {
     var debugP = document.getElementById('debug').checked;
     var overlayP = document.getElementById('overlay').checked;
 
+    // These are intentionally not synced with Chrome sync, because it's
+    // likely these will differ on a per-machine basis.
+    var nativeEnabledP = document.getElementById('nativeEnabled').checked;
+    var emacsclientLoc = document.getElementById('emacsclientLocation').value;
+
+    chrome.storage.local.set({
+        nativeEnabled: nativeEnabledP,
+        emacsclientLocation: emacsclientLoc
+    })
     chrome.storage.sync.set({
         selectedTemplate: selTemp,
         unselectedTemplate: unselTemp,
@@ -49,6 +58,13 @@ function save_options() {
 // stored in chrome.storage.
 function restore_options() {
     // Use default value color = 'red' and likesColor = true.
+    chrome.storage.local.get({
+        nativeEnabled: false,
+        emacsclientLocation: 'emacsclient',
+    }, function(options) {
+        document.getElementById('nativeEnabled').checked = options.nativeEnabled;
+        document.getElementById('emacsclientLocation').value = options.emacsclientLocation;
+    })
     chrome.storage.sync.get({
         selectedTemplate: 'p',
         unselectedTemplate: 'L',
